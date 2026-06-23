@@ -20,6 +20,13 @@ The desktop implementation or existing canonical design remains the single sourc
 - Non-unified interaction state across responsive variants
 - Multi-breakpoint validation before handoff
 
+## Operating Rules
+
+- Diagnose first: classify the root cause as content, structure, interaction, media, visual, or CSS priority before changing code.
+- For multi-section pages, build a module mapping table that tracks title, body, quantity, order, image/background, interaction, state source, mobile-allowed changes, and prohibited changes.
+- For implementation tasks, validate `375 / 390 / 414 / 430 / 768 / 1024 / 1440 / 1920` widths. For planning, review, or Figma-only tasks, state that browser verification was not run.
+- Do not use `display: none` as a fake fix for real canonical content, overlap, or broken structure.
+
 ## Install
 
 Clone or copy this folder into your Codex skills directory:

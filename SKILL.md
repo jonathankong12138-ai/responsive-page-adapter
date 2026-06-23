@@ -71,6 +71,8 @@ Before editing, identify the canonical baseline:
 - Identify what may change by breakpoint: spatial arrangement, density, disclosure, ordering for usability, control placement, and progressive reveal.
 - Identify what must not change by breakpoint: data source, meaning, validation, enabled or disabled rules, permissions, analytics semantics, and core task flow.
 
+For multi-section pages, produce a module mapping table before changing layout. Each module row must include: title, body/content summary, quantity/counts, canonical order, image/background requirements, interactions, state source, mobile-allowed changes, and prohibited changes. Use the table to prevent silent content loss, reordered business logic, mobile-only copy, and interaction drift.
+
 For Figma or screenshot work, do not blindly copy pixels. Use the visual artifact to infer layout intent, hierarchy, density, and spacing, then reconcile it with the real product state and component system.
 
 ## Non-Negotiable Rules
@@ -81,11 +83,12 @@ For Figma or screenshot work, do not blindly copy pixels. Use the visual artifac
 - Diagnose the failure category before modifying code. Do not mix visual polish with structural repair.
 - If duplicate DOM is unavoidable, make it a thin presentation variant driven by the same props, state, handlers, schema, and analytics source.
 - Never hide broken layout with broad `overflow-x: hidden` on `html`, `body`, or app roots unless the overflow is intentionally decorative and verified harmless.
+- Do not use `display: none` as a fake fix for overlap, crowding, or broken structure. It is allowed only for decorative layers, fallbacks, or inactive inaccessible duplicate variants when the canonical content and task flow remain available elsewhere.
 - Do not reduce content by deleting essential actions, columns, labels, or errors. Use stacking, cards, accordions, horizontal affordances, or detail views when density requires it.
 - Do not rely on hover-only controls for touch breakpoints.
 - Do not change desktop behavior while fixing mobile unless the desktop baseline is itself the bug.
 - Do not add new breakpoint names, tokens, or design primitives before checking existing project conventions.
-- Do not finish without visual or browser-level verification at representative mobile, tablet, and desktop sizes.
+- For implementation tasks, do not finish without visual or browser-level verification at the required acceptance breakpoints. For planning, review, or Figma-only judgment tasks, state that browser verification was not run and base conclusions on the available artifacts.
 
 ## Unified State Rule
 
@@ -109,6 +112,7 @@ Audit CSS before adding CSS:
 - Prefer existing tokens for spacing, type, color, radii, elevation, and breakpoints.
 - Keep specificity low. Fix source order, selector scope, or component structure before adding `!important`.
 - Treat CSS priority loss as a root-cause class, not as an invitation to add stronger selectors. Identify which rule wins, why it wins, and whether the winning rule belongs to the correct breakpoint or component boundary.
+- Treat `display: none` as content removal unless it is explicitly limited to decoration, fallback content, or an inactive duplicate variant hidden from interaction and accessibility.
 - Use mobile-first or desktop-first rules consistently with the codebase. Do not mix directions inside one component without a clear reason.
 - Prefer intrinsic layout tools: `min-width: 0`, `max-width: 100%`, `flex-wrap`, `grid-template-columns`, `minmax()`, `fit-content`, `clamp()`, aspect ratios, and container queries when supported.
 - Use `overflow` intentionally. Scroll containers must be discoverable, reachable by touch, and not trap sticky elements or keyboard focus.
@@ -122,7 +126,7 @@ Breakpoints describe layout meaning, not device brands.
 
 - Start from the project's configured breakpoints and naming conventions.
 - Define what each active breakpoint means for the page before editing. Avoid unclear breakpoint semantics such as "mobile styles at tablet width" or unrelated components using the same cutoff for different layout responsibilities without intent.
-- If no convention exists, validate at minimum: `390x844`, `430x932`, `768x1024`, `1024x768`, and `1440x900`.
+- Required acceptance widths are: `375`, `390`, `414`, `430`, `768`, `1024`, `1440`, and `1920`. Use project-defined heights when available; otherwise use realistic pairings such as `375x812`, `390x844`, `414x896`, `430x932`, `768x1024`, `1024x768`, `1440x900`, and `1920x1080`.
 - Treat breakpoints as transitions in layout responsibility: stacked phone layout, expanded phone layout, tablet layout, compact desktop, and full desktop.
 - Prefer content-driven breakpoints when a component fails before or after the global viewport breakpoint.
 - Use container queries when the layout depends on parent width rather than viewport width and the project supports them.
@@ -148,22 +152,25 @@ If a later step reveals a parity or state problem, return to step 1 or 2.
 
 ## Validation Matrix
 
-Validate both layout and behavior. Use browser automation or screenshots when available.
+Validate both layout and behavior. For implementation tasks, use browser automation, real browser inspection, or screenshots at the required acceptance widths. For planning, review, or Figma-only judgment tasks, explain which artifacts were reviewed and explicitly state that browser verification was not run.
 
 | Area | What to check |
 | --- | --- |
-| Mobile narrow | `390x844`; no horizontal scroll, overlap, clipped text, unreachable actions, or broken sticky areas. |
-| Mobile large | `430x932`; density, tap targets, forms, drawers, menus, and long content still work. |
-| Tablet portrait | `768x1024`; navigation, sidebars, cards, tables, and filters do not sit in an awkward half-state. |
-| Tablet landscape | `1024x768`; compact desktop or tablet layout is intentional and stable. |
-| Desktop | `1440x900`; canonical desktop behavior and density remain intact. |
+| Mobile 375 | `375x812`; narrow-phone accident replay: no horizontal scroll, overlap, clipped text, hidden canonical content, or unreachable primary actions. |
+| Mobile 390 | `390x844`; common narrow mobile: forms, drawers, sticky regions, and long content remain usable. |
+| Mobile 414 | `414x896`; large legacy mobile: check spacing thresholds, card wrapping, media sizing, and text density. |
+| Mobile 430 | `430x932`; large mobile: tap targets, modals, menus, filters, and mobile action placement still work. |
+| Tablet 768 | `768x1024`; tablet portrait: navigation, sidebars, cards, tables, and filters do not sit in an awkward half-state. |
+| Tablet or compact desktop 1024 | `1024x768`; tablet landscape or compact desktop layout is intentional and stable. |
+| Desktop 1440 | `1440x900`; canonical desktop behavior and density remain intact. |
+| Wide desktop 1920 | `1920x1080`; wide desktop does not over-stretch content, lose hierarchy, or reveal max-width/background issues. |
 | Breakpoint edges | Just below and above project cutoffs; no flicker, duplicate controls, or media query collisions. |
 | State parity | Inputs, errors, selected items, expanded panels, filters, URL params, loading, and pending states survive breakpoint changes. |
 | Interaction parity | Click, tap, keyboard, focus-visible, hover alternative, active, disabled, loading, error, and selected states work. |
 | Content stress | Long labels, long words, many items, empty data, loading data, error data, missing media, and localized strings fit. |
 | Accessibility | No duplicate labels, ids, landmarks, live regions, hidden interactive controls, or focus traps. |
 
-When possible, capture final screenshots for at least one mobile, one tablet, and one desktop viewport. If a repo already has Playwright, Cypress, Storybook, visual regression, or component tests, use the most relevant existing path instead of inventing a separate testing stack.
+For implementation tasks, capture or inspect final output across `375`, `390`, `414`, `430`, `768`, `1024`, `1440`, and `1920` widths. If a repo already has Playwright, Cypress, Storybook, visual regression, or component tests, use the most relevant existing path instead of inventing a separate testing stack.
 
 ## Output Style
 
@@ -173,5 +180,6 @@ When reporting results:
 - Name the breakpoint behavior added or repaired.
 - Mention state unification or duplicated DOM handling when relevant.
 - List the viewports and interactions verified.
-- Call out any viewport, state, or artifact that could not be checked.
+- For implementation tasks, list the required acceptance widths checked. For planning, review, or Figma-only tasks, state that browser verification was not run and name the artifacts reviewed.
+- Call out any viewport, state, interaction, or artifact that could not be checked.
 - Keep the summary practical and implementation-focused. Do not require the user to use a special prompt in the future.

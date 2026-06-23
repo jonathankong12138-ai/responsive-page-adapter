@@ -25,13 +25,20 @@ REQUIRED_SECTIONS = [
 REQUIRED_PHRASES = [
     "先同源，再重排，最后美化",
     "content, structure, interaction, media, visual, or CSS priority",
+    "module mapping table",
+    "title, body/content summary, quantity/counts, canonical order, image/background requirements, interactions, state source, mobile-allowed changes, and prohibited changes",
     "内容系统双写",
     "交互状态不同源",
     "mobile 结构重写过度",
     "CSS 优先级失控",
     "断点语义不清",
     "视觉问题和结构问题混在一起",
+    "display: none",
+    "For implementation tasks",
+    "For planning, review, or Figma-only",
 ]
+
+REQUIRED_BREAKPOINT_WIDTHS = ["375", "390", "414", "430", "768", "1024", "1440", "1920"]
 
 
 def fail(message: str) -> int:
@@ -93,6 +100,10 @@ def main() -> int:
     for phrase in REQUIRED_PHRASES:
         if phrase not in text:
             return fail(f"missing required phrase: {phrase}")
+
+    for width in REQUIRED_BREAKPOINT_WIDTHS:
+        if f"`{width}`" not in text and f"`{width}x" not in text:
+            return fail(f"missing required acceptance breakpoint width: {width}")
 
     if "Use $responsive-page-adapter" not in openai_yaml.read_text(encoding="utf-8"):
         return fail("agents/openai.yaml default_prompt must mention $responsive-page-adapter")
